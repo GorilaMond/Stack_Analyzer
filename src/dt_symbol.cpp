@@ -186,10 +186,10 @@ bool is_space(int ch) {
     return std::isspace(ch);
 }
 
-static inline void rtrim(std::string &s)
-{
-    s.erase(std::find_if(s.rbegin(), s.rend(), is_space).base(), s.end());
-}
+// static inline void rtrim(std::string &s)
+// {
+//     s.erase(std::find_if(s.rbegin(), s.rend(), is_space).base(), s.end());
+// }
 
 static bool get_next_kernel_symbol(
         std::set<symbol> &syms,
