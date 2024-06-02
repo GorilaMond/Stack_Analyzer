@@ -2,7 +2,7 @@
 stack_analyzer
 exporter/exporter
 bpf_skel
-lib
+include/vmlinux.h
 .*
 
 !.gitignore
