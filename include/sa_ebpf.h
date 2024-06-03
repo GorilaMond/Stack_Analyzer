@@ -105,6 +105,10 @@
  * 该内存顺序不能是__ATOMIC_RELEASE或__ATOMIC_ACQ_REL，
  * 并且不能比success_memorder更严格。
  */
+
+#if KERNEL_VERSION_CODE < KERNEL_VERSION(5, 5, 0)
+#define CHECK_FREQ(_ts)
+#else
 #define CHECK_FREQ(_ts)                               \
     if (freq)                                         \
     {                                                 \
@@ -114,6 +118,7 @@
                 __ATOMIC_RELAXED, __ATOMIC_RELAXED))  \
             return 0;                                 \
     }
+#endif
 
 #define GET_CURR \
     (struct task_struct *)bpf_get_current_task()
