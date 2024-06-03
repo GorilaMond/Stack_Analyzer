@@ -20,6 +20,7 @@
 #define STACK_ANALYZER_EBPF
 
 #include "sa_common.h"
+#include <linux/version.h>
 
 #define PF_KTHREAD 0x00200000
 
@@ -118,7 +119,7 @@
     (struct task_struct *)bpf_get_current_task()
 
 // 如果没有设置目标进程，则检查被采集进程是否为内核线程，是则退出采集
-#define CHECK_KTHREAD(_task)                                     \
+#define CHECK_KTHREAD(_task)                                      \
     if (!target_tgid && BPF_CORE_READ(_task, flags) & PF_KTHREAD) \
         return 0;
 
@@ -129,9 +130,15 @@
 #define GET_KNODE(_task) \
     BPF_CORE_READ(_task, cgroups, dfl_cgrp, kn)
 
+#if KERNEL_VERSION_CODE < KERNEL_VERSION(5, 5, 0)
+#define CHECK_CGID(_knode)                                                      \
+    if (target_cgroupid > 0 && BPF_CORE_READ(_knode, id.id) != target_cgroupid) \
+        return 0;
+#else
 #define CHECK_CGID(_knode)                                                   \
     if (target_cgroupid > 0 && BPF_CORE_READ(_knode, id) != target_cgroupid) \
         return 0;
+#endif
 
 #define TRY_SAVE_INFO(_task, _pid, _tgid, _knode)                                                  \
     if (!bpf_map_lookup_elem(&pid_info_map, &_pid))                                                \
