@@ -112,6 +112,23 @@ namespace helper
 
         return ret;
     }
+    bool pin_map(bpf_object *obj, std::string map_name, std::string dir_path)
+    {
+        struct bpf_map *bpf_map = bpf_object__find_map_by_name(obj, map_name.c_str());
+        if (!bpf_map)
+        {
+            fprintf(stderr, "Failed to find BPF map\n");
+            return false;
+        }
+        auto map_path = dir_path + '/' + map_name;
+        bpf_map__unpin(bpf_map, map_path.c_str());
+        if (bpf_map__pin(bpf_map, map_path.c_str()))
+        {
+            fprintf(stderr, "Failed to pin BPF map\n");
+            return false;
+        }
+        return true;
+    }
 }
 
 void end_handle(void)
@@ -178,18 +195,18 @@ int main(int argc, char *argv[])
                               "Set sampling period; default is 100");
 
         auto ProbeOption = clipp::option("probe")
-                                         .call([]
-                                               { StackCollectorList.push_back(new ProbeStackCollector()); }) %
-                                     COLLECTOR_INFO("probe") &
-                                 (clipp::value("probe", StrTmp)
-                                      .call([]
-                                            { static_cast<ProbeStackCollector *>(StackCollectorList.back())
-                                                  ->setScale(StrTmp); }) %
-                                  "Set the probe string; specific use is:\n"
-                                  "<func> | p::<func>             -- probe a kernel function;\n"
-                                  "<lib>:<func> | p:<lib>:<func>  -- probe a user-space function in the library 'lib';\n"
-                                  "t:<class>:<func>               -- probe a kernel tracepoint;\n"
-                                  "u:<lib>:<probe>                -- probe a USDT tracepoint");
+                                   .call([]
+                                         { StackCollectorList.push_back(new ProbeStackCollector()); }) %
+                               COLLECTOR_INFO("probe") &
+                           (clipp::value("probe", StrTmp)
+                                .call([]
+                                      { static_cast<ProbeStackCollector *>(StackCollectorList.back())
+                                            ->setScale(StrTmp); }) %
+                            "Set the probe string; specific use is:\n"
+                            "<func> | p::<func>             -- probe a kernel function;\n"
+                            "<lib>:<func> | p:<lib>:<func>  -- probe a user-space function in the library 'lib';\n"
+                            "t:<class>:<func>               -- probe a kernel tracepoint;\n"
+                            "u:<lib>:<probe>                -- probe a USDT tracepoint");
 
         auto MainOption = _GREEN "Some overall options" _RE %
                           ((
