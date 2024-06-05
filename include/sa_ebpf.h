@@ -106,7 +106,7 @@
  * 并且不能比success_memorder更严格。
  */
 
-#if KERNEL_VERSION_CODE < KERNEL_VERSION(5, 5, 0)
+#if LINUX_VERSION_CODE < KERNEL_VERSION(5, 5, 0)
 #define CHECK_FREQ(_ts)
 #else
 #define CHECK_FREQ(_ts)                               \
@@ -135,7 +135,7 @@
 #define GET_KNODE(_task) \
     BPF_CORE_READ(_task, cgroups, dfl_cgrp, kn)
 
-#if KERNEL_VERSION_CODE < KERNEL_VERSION(5, 5, 0)
+#if LINUX_VERSION_CODE < KERNEL_VERSION(5, 5, 0)
 #define CHECK_CGID(_knode)                                                      \
     if (target_cgroupid > 0 && BPF_CORE_READ(_knode, id.id) != target_cgroupid) \
         return 0;
