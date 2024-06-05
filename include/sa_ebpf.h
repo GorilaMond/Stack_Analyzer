@@ -39,13 +39,13 @@
 /// @param name 新散列表的名字
 /// @param type1 键的类型
 /// @param type2 值的类型
-#define BPF_HASH(name, type1, type2)       \
-    struct                                 \
-    {                                      \
-        __uint(type, BPF_MAP_TYPE_HASH);   \
-        __uint(key_size, sizeof(type1));   \
-        __uint(value_size, sizeof(type2)); \
-        __uint(max_entries, MAX_ENTRIES);  \
+#define BPF_HASH(name, type1, type2)      \
+    struct                                \
+    {                                     \
+        __uint(type, BPF_MAP_TYPE_HASH);  \
+        __type(key, type1);               \
+        __type(value, type2);             \
+        __uint(max_entries, MAX_ENTRIES); \
     } name SEC(".maps")
 
 /**
