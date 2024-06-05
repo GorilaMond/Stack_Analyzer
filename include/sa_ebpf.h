@@ -58,6 +58,8 @@
  * type：指定count值的类型
  */
 #define COMMON_MAPS(count_type)                              \
+    BPF_HASH(tgids, __u32, bool);                            \
+    BPF_HASH(cgroups, __u64, bool);                          \
     BPF_HASH(psid_count_map, psid, count_type, MAX_ENTRIES); \
     BPF_STACK_TRACE(sid_trace_map);                          \
     BPF_HASH(tgid_cgroup_map, __u32,                         \
