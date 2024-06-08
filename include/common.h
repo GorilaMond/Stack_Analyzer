@@ -38,11 +38,4 @@ typedef struct {
     char comm[COMM_LEN];
 } task_info;
 
-#define _COL_PREFIX "\033["
-#define _BLUE _COL_PREFIX "1;34m"
-#define _GREEN _COL_PREFIX "1;32m"
-#define _RED _COL_PREFIX "1;35m"
-#define _ERED _COL_PREFIX "1;31m"
-#define _RE _COL_PREFIX "0m"
-
 #endif

@@ -26,7 +26,14 @@
 #include <signal.h>
 #include <unistd.h>
 
-#include "sa_common.h"
+#include "common.h"
+
+#define _COL_PREFIX "\033["
+#define _BLUE _COL_PREFIX "1;34m"
+#define _GREEN _COL_PREFIX "1;32m"
+#define _RED _COL_PREFIX "1;35m"
+#define _ERED _COL_PREFIX "1;31m"
+#define _RE _COL_PREFIX "0m"
 
 #define PUT_ERR_REASON \
 	fprintf(stderr, _ERED " [%s]\n" _RE, strerror(errno));

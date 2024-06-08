@@ -17,8 +17,8 @@
 // 包装用于采集调用栈数据的eBPF程序，规定一些抽象接口和通用变量
 
 #include "bpf_wapper/eBPFStackCollector.h"
-#include "sa_user.h"
-#include "dt_symbol.h"
+#include "user.h"
+#include "symbol.h"
 
 #include <sstream>
 #include <map>

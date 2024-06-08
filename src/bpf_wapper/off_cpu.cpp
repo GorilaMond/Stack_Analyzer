@@ -17,7 +17,7 @@
 // off cpu ebpf程序的包装类，实现接口和一些自定义方法
 
 #include "bpf_wapper/off_cpu.h"
-#include "dt_symbol.h"
+#include "symbol.h"
 
 OffCPUStackCollector::OffCPUStackCollector()
 {

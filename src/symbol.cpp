@@ -12,8 +12,8 @@
 #include <algorithm>
 #include <cxxabi.h>
 
-#include "dt_symbol.h"
-#include "dt_elf.h"
+#include "symbol.h"
+#include "lelf.h"
 
 void restore_global_env();
 int attach_ns_env(int pid);

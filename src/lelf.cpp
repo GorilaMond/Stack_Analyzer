@@ -6,7 +6,7 @@
  * License terms: GNU General Public License (GPL) version 3
  *
  */
-#include "dt_elf.h"
+#include "lelf.h"
 
 #include <elf.h>
 #include <unistd.h>
