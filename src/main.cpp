@@ -32,6 +32,7 @@
 #include "user.h"
 #include "clipp.h"
 #include "cgroup.h"
+#include "trace.h"
 
 bool timeout = false;
 std::vector<StackCollector *> StackCollectorList;
@@ -229,6 +230,19 @@ int main(int argc, char *argv[])
         }
     }
 
+    ksyms = ksyms__load();
+    if (!ksyms)
+    {
+        fprintf(stderr, "failed to load kallsyms\n");
+        exit(1);
+    }
+    syms_cache = syms_cache__new(0);
+    if (!syms_cache)
+    {
+        fprintf(stderr, "failed to create syms_cache\n");
+        exit(1);
+    }
+
     for (auto Item = StackCollectorList.begin(); Item != StackCollectorList.end();)
     {
         fprintf(stderr, _RED "Attach collecotor%d %s.\n" _RE,
@@ -277,6 +291,7 @@ int main(int argc, char *argv[])
         CHECK_ERR_RN1(write(fds.fd, trig, strlen(trig) + 1) < 0, "%s write error", path);
         fprintf(stderr, _RED "Waiting for events...\n" _RE);
     }
+
     fprintf(stderr, _RED "Running for %lus or Hit Ctrl-C to end.\n" _RE, MainConfig::run_time);
     for (; (uint64_t)time(NULL) < stop_time && (MainConfig::target_tgid < 0 || !kill(MainConfig::target_tgid, 0));)
     {

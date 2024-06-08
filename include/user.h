@@ -74,4 +74,17 @@
 
 #define COLLECTOR_INFO(_name) _BLUE "\b\b\b\bCollector for " _name " trace" _RE
 
+inline void clearSpace(char *sym)
+{
+	for (char *p = sym; *p; p++)
+	{
+		if (*p != ' ')
+		{
+			*sym = *p;
+			sym++;
+		}
+	}
+	*sym = '\0';
+}
+
 #endif
