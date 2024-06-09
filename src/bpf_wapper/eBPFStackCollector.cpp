@@ -56,7 +56,7 @@ std::vector<CountItem> *StackCollector::sortedCountList(void)
     auto value_fd = bpf_object__find_map_fd_by_name(obj, "psid_count_map");
 
     auto D = new std::vector<CountItem>();
-#if KERNEL_VERSION_CODE < KERNEL_VERSION(5, 5, 0)
+#if LINUX_VERSION_CODE < KERNEL_VERSION(5, 5, 0)
     for (psid prev_key = {0}, curr_key = {0};; prev_key = curr_key)
     {
         if (bpf_map_get_next_key(value_fd, &prev_key, &curr_key))
@@ -94,7 +94,6 @@ std::vector<CountItem> *StackCollector::sortedCountList(void)
     if (err == EFAULT)
         return NULL;
 
-    auto D = new std::vector<CountItem>();
     for (uint32_t i = 0; i < count; i++)
     {
         CountItem d(keys[i], count_values(vals + val_size * i));
