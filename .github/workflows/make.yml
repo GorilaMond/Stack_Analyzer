@@ -16,7 +16,7 @@ jobs:
     - name: dependency
       run: |
         sudo apt update
-        sudo apt install -y clang libelf1 libelf-dev zlib1g-dev bpftool
+        sudo apt install -y clang libelf1 libelf-dev zlib1g-dev
     - name: make
       run: make -j$(nproc)
     - name: clean
