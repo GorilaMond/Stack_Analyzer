@@ -40,11 +40,13 @@ VMLINUX := include/vmlinux.h
 # libbpf to avoid dependency on system-wide headers, which could be missing or
 # outdated
 INCLUDES := -I./include -I./$(OUTPUT) -I./$(BPF_SKEL) -I$(LIBBPF_ROOT)/include/uapi -I$(dir $(VMLINUX))
-CFLAGS := -Og -Wall
+CFLAGS := -Og -Wall -fPIC
 ALL_LDFLAGS := $(LDFLAGS) $(EXTRA_LDFLAGS)
 
 BIN = $(patsubst src/%.cpp, %, ${wildcard src/*.cpp})
 BPF = $(patsubst bpf/%.bpf.c, %, ${wildcard bpf/*.bpf.c})
+BPF_OBJ = $(patsubst %,$(OUTPUT)/%.bpf.o,$(BPF))
+BPF_SKEL_H = $(patsubst %,$(BPF_SKEL)/%.skel.h,$(BPF))
 
 TARGETS = stack_analyzer
 
@@ -117,7 +119,7 @@ $(BPFTOOL): $(BPFTOOL_SRC) | $(BPFTOOL_OUTPUT)
 	$(Q)$(MAKE) ARCH= CROSS_COMPILE= OUTPUT=$(BPFTOOL_OUTPUT)/ -C $(BPFTOOL_SRC) bootstrap
 
 # Build BPF code
-$(OUTPUT)/%.bpf.o: bpf/%.bpf.c include/sa_ebpf.h $(LIBBPF_OBJ) $(VMLINUX) | $(OUTPUT) $(BPFTOOL)
+$(BPF_OBJ): $(OUTPUT)/%.bpf.o: bpf/%.bpf.c include/ebpf.h $(LIBBPF_OBJ) $(VMLINUX) | $(OUTPUT) $(BPFTOOL)
 	$(call msg,BPF,$@)
 	$(Q)$(CLANG) -g -O2 -target bpf -D__TARGET_ARCH_$(ARCH)		      \
 		     $(INCLUDES) $(CLANG_BPF_SYS_INCLUDES)		      \
@@ -125,7 +127,7 @@ $(OUTPUT)/%.bpf.o: bpf/%.bpf.c include/sa_ebpf.h $(LIBBPF_OBJ) $(VMLINUX) | $(OU
 	$(Q)$(BPFTOOL) gen object $@ $(patsubst %.bpf.o,%.tmp.bpf.o,$@)
 
 # Generate BPF skeletons
-$(BPF_SKEL)/%.skel.h: $(OUTPUT)/%.bpf.o | $(OUTPUT) $(BPFTOOL) $(BPF_SKEL)
+$(BPF_SKEL_H): $(BPF_SKEL)/%.skel.h: $(OUTPUT)/%.bpf.o | $(OUTPUT) $(BPFTOOL) $(BPF_SKEL)
 	$(call msg,GEN-SKEL,$@)
 	$(Q)$(BPFTOOL) gen skeleton $< > $@
 
@@ -134,7 +136,7 @@ $(patsubst %,$(OUTPUT)/%.o,$(BPF)): $(OUTPUT)/%.o: src/bpf_wapper/%.cpp include/
 	$(Q)$(CXX) $(CFLAGS) $(INCLUDES) -c $< -o $@
 
 # Build depending library
-$(patsubst %,$(OUTPUT)/%.o,$(BIN)): $(OUTPUT)/%.o: src/%.cpp $(patsubst %,$(BPF_SKEL)/%.skel.h,$(BPF))
+$(patsubst %,$(OUTPUT)/%.o,$(BIN)): $(OUTPUT)/%.o: src/%.cpp $(BPF_SKEL_H)
 	$(call msg,CXX,$@)
 	$(Q)$(CXX) $(CFLAGS) $(INCLUDES) -c $< -o $@
 
