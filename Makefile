@@ -47,6 +47,8 @@ BIN = $(patsubst src/%.cpp, %, ${wildcard src/*.cpp})
 BPF = $(patsubst bpf/%.bpf.c, %, ${wildcard bpf/*.bpf.c})
 BPF_OBJ = $(patsubst %,$(OUTPUT)/%.bpf.o,$(BPF))
 BPF_SKEL_H = $(patsubst %,$(BPF_SKEL)/%.skel.h,$(BPF))
+BPF_WAPPER = $(patsubst %,$(OUTPUT)/%.o,$(BPF))
+BIN_OBJ = $(patsubst %,$(OUTPUT)/%.o,$(BIN))
 
 TARGETS = stack_analyzer
 
@@ -131,12 +133,12 @@ $(BPF_SKEL_H): $(BPF_SKEL)/%.skel.h: $(OUTPUT)/%.bpf.o | $(OUTPUT) $(BPFTOOL) $(
 	$(call msg,GEN-SKEL,$@)
 	$(Q)$(BPFTOOL) gen skeleton $< > $@
 
-$(patsubst %,$(OUTPUT)/%.o,$(BPF)): $(OUTPUT)/%.o: src/bpf_wapper/%.cpp include/bpf_wapper/%.h $(BPF_SKEL)/%.skel.h $(OUTPUT)/eBPFStackCollector.o
+$(BPF_WAPPER): $(OUTPUT)/%.o: src/bpf_wapper/%.cpp include/bpf_wapper/%.h $(BPF_SKEL)/%.skel.h $(OUTPUT)/eBPFStackCollector.o
 	$(call msg,CXX,$@)
 	$(Q)$(CXX) $(CFLAGS) $(INCLUDES) -c $< -o $@
 
 # Build depending library
-$(patsubst %,$(OUTPUT)/%.o,$(BIN)): $(OUTPUT)/%.o: src/%.cpp $(BPF_SKEL_H)
+$(BIN_OBJ): $(OUTPUT)/%.o: src/%.cpp $(BPF_SKEL_H)
 	$(call msg,CXX,$@)
 	$(Q)$(CXX) $(CFLAGS) $(INCLUDES) -c $< -o $@
 
@@ -145,7 +147,7 @@ $(OUTPUT)/eBPFStackCollector.o: src/bpf_wapper/eBPFStackCollector.cpp include/bp
 	$(Q)$(CXX) $(CFLAGS) $(INCLUDES) -c $< -o $@
 
 # Build application binary
-$(TARGETS): $(OUTPUT)/eBPFStackCollector.o $(patsubst %,$(OUTPUT)/%.o,$(BIN)) $(patsubst %,$(OUTPUT)/%.o,$(BPF)) $(LIBBPF_OBJ)
+$(TARGETS): $(OUTPUT)/eBPFStackCollector.o $(BIN_OBJ) $(BPF_WAPPER) $(LIBBPF_OBJ)
 	$(call msg,BINARY,$@)
 	$(Q)$(CXX) $^ $(ALL_LDFLAGS) -lstdc++ -lelf -lz -o $@
 
