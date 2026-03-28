@@ -48,7 +48,7 @@ namespace MainConfig
     std::string trigger = "";    // 触发器
     std::string trig_event = ""; // 触发事件
     uint32_t top = 10;
-    uint32_t freq = 49;
+    uint32_t freq = 0;
     bool trace_user = false;
     bool trace_kernel = false;
 }
@@ -133,7 +133,7 @@ int main(int argc, char *argv[])
                                "Set the top number; default is 10",
                            (clipp::option("-f") &
                             clipp::value("freq", MainConfig::freq)) %
-                               "Set sampling frequency, 0 for close; default is 49",
+                               "Set sampling frequency, default is 0 for close freq sampling",
                            (clipp::option("-i") &
                             clipp::value("interval", MainConfig::delay)) %
                                "Set the output delay time (seconds); default is 5",

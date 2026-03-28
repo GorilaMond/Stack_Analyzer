@@ -113,6 +113,7 @@ $(LIBBPF_OBJ): $(LIBBPF_SRC) $(wildcard $(LIBBPF_SRC)/*.[ch] $(LIBBPF_SRC)/Makef
 	$(Q)$(MAKE) -C $(LIBBPF_SRC) BUILD_STATIC_ONLY=1  \
 		    OBJDIR=$(dir $@)/libbpf DESTDIR=$(dir $@) \
 		    INCLUDEDIR= LIBDIR= UAPIDIR=			  \
+		    EXTRA_CFLAGS="-fPIC"				  \
 		    install
 
 # Build bpftool
